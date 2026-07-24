@@ -36,10 +36,10 @@ CliArgs → RenameConfig (shared config) → discover_files() → generate_plan(
 
 ### Core (`src/core/`)
 - **`discover.rs`** — `discover_files(dir, extensions)` scans a directory for files matching given extensions (or all files if empty). Skips hidden files (dotfiles) and symlinks. Case-insensitive extension matching.
-- **`rename.rs`** — `generate_plan(files, config)` produces a `Vec<RenameOp>` with from/to paths and status. Pipeline: strip prefix → strip suffix → strip quality/lang tags (regex) → normalize separators → format `"{title} - {base}.{ext}"`. `execute_plan(ops, dry_run)` renames files on disk or simulates. Idempotent (only acts on `Pending` ops). Collision detection is case-insensitive.
+- **`rename.rs`** — `generate_plan(files, config)` produces a `Vec<RenameOp>` with from/to paths and status. Pipeline: strip prefix → strip suffix → strip quality/lang tags → normalize separators → format `"{title} - {base}.{ext}"`. `execute_plan(ops, dry_run)` renames files on disk or simulates. Idempotent (only acts on `Pending` ops). Collision detection is case-insensitive.
 
 ### CLI (`src/cli.rs`)
-- `run_cli()`: discover → generate plan → print table → confirm prompt if `--exec` → execute. Dry-run default. `--yes` flag skips confirmation (for scripting).
+- `run_cli()`: discover → generate plan → print table → confirm prompt if `--exec` → execute. Dry-run default. `--yes` flag skips confirmation (for scripting). `--auto-number` / `-a`: on collision, append `" (2)"`, `" (3)"`, … instead of skipping.
 
 ### TUI (`src/tui/`)
 - **4-step wizard**: Folder → Rules → Preview → Execute, with breadcrumb showing current folder/title
@@ -47,10 +47,10 @@ CliArgs → RenameConfig (shared config) → discover_files() → generate_plan(
 - **Async execution**: rename work runs on a `std::thread` + `mpsc` channel. Progress messages are drained each frame via `poll_execute()`. During execution, keyboard input is ignored.
 - **Quick-nav**: pressing `1`/`2`/`3`/`4` jumps to a visited step (numeric shortcut keys, handled in every step handler via `jump_to()`).
 - **Rendering** (`ui.rs`): router dispatches to step renderers + confirm-quit overlay. Terminal too small (<60x20) shows warning.
-- **Theming** (`theme.rs`): Catppuccin Mocha palette with semantic mappings
+- **Theming** (`theme.rs`): Catppuccin Mocha palette with semantic mappings. Respects `$NO_COLOR` (https://no-color.org) — falls back to monochrome grayscale.
 - **Steps** (`steps/`):
   - `folder.rs` — file tree browser with path bar (free-text typing) and file list (vim keys h/j/k/l). **`render_header()`** lives here despite being shared — other steps import via `super::folder::render_header`.
-  - `rules.rs` — 4 form fields (title/prefix/suffix/extensions) + mode toggle (simulate/execute) + collision handling option (Skip & flag / Auto-number). **`collision_auto_num` toggle exists in UI but is not yet wired to `generate_plan()`** — renaming always uses first-wins collision detection, not auto-numbering.
+  - `rules.rs` — 4 form fields (title/prefix/suffix/extensions) + mode toggle (simulate/execute) + collision handling option (Skip & flag / Auto-number). **Collision auto‑numbering**: the "Auto‑number" toggle in Rules, `--auto-number` / `-a` CLI flag, and `collision_auto_num` config field are wired end‑to‑end: colliding files get `" (2)"`, `" (3)"`, … suffixes instead of being skipped.
   - `preview.rs` — filterable scrollable list with 4 tabs (All/ToRename/Skipped/Error). Count bar at bottom.
   - `execute.rs` — ready screen with mode warning, progress bar (Gauge widget) during execution, done screen with stats and error listing
 - **Widgets**: `FormField` (editable text field with cursor+scroll), `Breadcrumb` (folder+title line), `PreviewWidget` (scrollable op list with status icons)
@@ -58,6 +58,6 @@ CliArgs → RenameConfig (shared config) → discover_files() → generate_plan(
 ### Dependencies
 - `clap 4` (derive) — CLI parsing
 - `ratatui 0.29` + `crossterm 0.28` — TUI
-- `regex 1` — quality tag stripping
+- `ctrlc 3` — Ctrl+C handler in TUI
 - `anyhow 1` — error handling
 - `tempfile 3` (dev) — test temp dirs

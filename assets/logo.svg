@@ -1,0 +1,33 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8aadf4"></stop>
+      <stop offset="100%" stop-color="#f5bde6"></stop>
+    </linearGradient>
+
+    <linearGradient id="frameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b7bdf8"></stop>
+      <stop offset="100%" stop-color="#939ab7"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- terminal frame -->
+  <path d="M48 52
+       a16 16 0 0 1 16-16
+       h112" fill="none" stroke="url(#frameGradient)" stroke-width="14" stroke-linecap="round"></path>
+
+  <path d="M48 52
+       v128
+       a16 16 0 0 0 16 16" fill="none" stroke="url(#frameGradient)" stroke-width="14" stroke-linecap="round"></path>
+
+  <!-- prompt -->
+  <path d="M80 84 L98 98 L80 112" fill="none" stroke="#f5bde6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+
+  <line x1="108" y1="98" x2="128" y2="98" stroke="#f5bde6" stroke-width="8" stroke-linecap="round"></line>
+
+  <!-- N -->
+  <path d="M88 176
+         V124
+         L168 196
+         V88" fill="none" stroke="url(#nGradient)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
