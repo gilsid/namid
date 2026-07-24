@@ -1,0 +1,19 @@
+[package]
+name = "namid"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Batch rename files with a clean Title - Name format (CLI + TUI)"
+license = "MIT"
+repository = "https://github.com/user/namid"
+keywords = ["rename", "file-renaming", "batch", "tui"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.29"
+crossterm = "0.28"
+anyhow = "1"
+ctrlc = "3"
+
+[dev-dependencies]
+tempfile = "3"
